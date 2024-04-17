@@ -157,7 +157,7 @@
                     const timestamp = new Date().toLocaleString();
                     const deviceId = window.localStorage.getItem('deviceId')
                     
-                    set(ref(db, 'ngl-messages/' + deviceId + timestamp), {
+                    set(ref(db, 'ngl-messages/' + deviceId + "/" + Date.now()), {
                         question: question,
                         model: model,
                         architecture: architecture,
